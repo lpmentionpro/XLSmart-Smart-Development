@@ -1,0 +1,47 @@
+# Excel lock / temporary files
+~$*
+*.tmp
+*.temp
+*.bak
+*.old
+*.wbk
+*.xlk
+*.asd
+*.log
+*.ps1.tmp
+
+# Backup folders
+backups/
+backup/
+Backups/
+
+# Temporary / cache / build folders
+temp/
+tmp/
+.cache/
+dist/
+build/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE / editor
+.vscode/
+.idea/
+
+# Patch rejects
+*.orig
+*.rej
+
+# Local env / secrets
+.env
+*.local
+
+# Python
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
