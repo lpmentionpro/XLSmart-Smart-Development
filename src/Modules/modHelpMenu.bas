@@ -22,6 +22,7 @@ Public Sub Help_CheckUpdates(control As IRibbonControl)
     Dim responseText As String
     Dim latestVersion As String
     Dim downloadUrl As String
+    Dim sha256Expected As String
 
     On Error GoTo ErrHandler
 
@@ -32,9 +33,10 @@ Public Sub Help_CheckUpdates(control As IRibbonControl)
 
     If http.Status <> 200 Then
 
-        MsgBox "Unable to check updates right now.", _
+        MsgBox "Unable to check updates right now." & vbCrLf & vbCrLf & _
+               "Please check your internet connection.", _
                vbExclamation, _
-               "XLSmart"
+               "XLSmart Update"
 
         Exit Sub
 
@@ -44,13 +46,14 @@ Public Sub Help_CheckUpdates(control As IRibbonControl)
 
     latestVersion = GetJsonValue(responseText, "version")
     downloadUrl = GetJsonValue(responseText, "download_url")
+    sha256Expected = GetJsonValue(responseText, "sha256")
 
     If latestVersion = APP_VERSION Then
 
         MsgBox "You are already using the latest version of XLSmart (" & _
                APP_VERSION & ").", _
                vbInformation, _
-               "XLSmart"
+               "XLSmart Update"
 
     Else
 
@@ -58,11 +61,12 @@ Public Sub Help_CheckUpdates(control As IRibbonControl)
             "New XLSmart update available!" & vbCrLf & vbCrLf & _
             "Current Version: " & APP_VERSION & vbCrLf & _
             "Latest Version: " & latestVersion & vbCrLf & vbCrLf & _
-            "Do you want to update now?", _
+            "Do you want to update now?" & vbCrLf & vbCrLf & _
+            "(Excel will restart after update)", _
             vbYesNo + vbQuestion, _
             "XLSmart Update") = vbYes Then
 
-            ThisWorkbook.FollowHyperlink downloadUrl
+            Call PerformUpdate(downloadUrl, sha256Expected)
 
         End If
 
@@ -74,9 +78,128 @@ ErrHandler:
 
     MsgBox "Internet connection or update server problem.", _
            vbExclamation, _
-           "XLSmart"
+           "XLSmart Update"
 
 End Sub
+
+
+'=================================
+' PERFORM AUTOMATIC UPDATE
+'=================================
+Private Sub PerformUpdate(ByVal downloadUrl As String, ByVal expectedSha256 As String)
+
+    Dim http As Object
+    Dim stream As Object
+    Dim dst As String
+    Dim ai As AddIn
+    Dim downloadedHash As String
+
+    On Error GoTo ErrHandler
+
+    Application.DisplayAlerts = False
+    Application.StatusBar = "XLSmart: Downloading update..."
+
+    ' Download URL
+    Set http = CreateObject("MSXML2.XMLHTTP")
+    http.Open "GET", downloadUrl, False
+    http.Send
+
+    If http.Status <> 200 Then
+        Err.Raise vbObjectError + 500, , "Download failed. HTTP Status: " & http.Status
+    End If
+
+    Application.StatusBar = "XLSmart: Installing update..."
+
+    ' Destination path
+    dst = Environ$("APPDATA") & "\Microsoft\AddIns\XLSmart_User.xlam"
+
+    ' Backup existing version
+    If Dir(dst) <> "" Then
+        On Error Resume Next
+        SetAttr dst, vbNormal
+        Dim backupPath As String
+        backupPath = dst & ".backup"
+        Kill backupPath
+        Name dst As backupPath
+        On Error GoTo ErrHandler
+    End If
+
+    ' Save downloaded file
+    Set stream = CreateObject("ADODB.Stream")
+    stream.Type = 1
+    stream.Open
+    stream.Write http.responseBody
+    stream.SaveToFile dst, 2
+    stream.Close
+
+    ' Verify SHA256 if provided
+    If Len(expectedSha256) > 0 Then
+        downloadedHash = GetFileSha256(dst)
+        If LCase(downloadedHash) <> LCase(expectedSha256) Then
+            Err.Raise vbObjectError + 501, , "File integrity check failed."
+        End If
+    End If
+
+    ' Unload old add-in
+    On Error Resume Next
+    For Each ai In AddIns
+        If LCase(ai.Name) = "xlsmart_user.xlam" Then
+            ai.Installed = False
+            AddIns.Remove ai
+            Exit For
+        End If
+    Next ai
+    On Error GoTo ErrHandler
+
+    ' Install new add-in
+    Set ai = AddIns.Add(dst)
+    ai.Installed = True
+
+    Application.StatusBar = False
+    Application.DisplayAlerts = True
+
+    MsgBox "XLSmart updated successfully!" & vbCrLf & vbCrLf & _
+           "Excel will now restart.", _
+           vbInformation, _
+           "Update Complete"
+
+    Application.Quit
+
+    Exit Sub
+
+ErrHandler:
+
+    Application.StatusBar = False
+    Application.DisplayAlerts = True
+
+    MsgBox "Update failed:" & vbCrLf & vbCrLf & _
+           Err.Description, _
+           vbCritical, _
+           "Update Error"
+
+End Sub
+
+
+'=================================
+' CALCULATE FILE SHA256
+'=================================
+Private Function GetFileSha256(ByVal filePath As String) As String
+
+    Dim shell As Object
+    Dim exec As Object
+    Dim output As String
+
+    On Error Resume Next
+
+    Set shell = CreateObject("WScript.Shell")
+    Set exec = shell.Exec("powershell -NoProfile -Command ""(Get-FileHash -Path '" & filePath & "' -Algorithm SHA256).Hash""")
+    output = exec.StdOut.ReadAll()
+
+    GetFileSha256 = Trim(output)
+
+    On Error GoTo 0
+
+End Function
 
 
 Private Function GetJsonValue(jsonText As String, key As String) As String

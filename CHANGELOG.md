@@ -16,6 +16,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Documentation and comparison reports
 - Phase 4 PowerDashboard comparison report (local source vs. embedded xlam copy): `docs/PHASE4_POWERDASHBOARD_COMPARISON.md` with evidence in `docs/phase4-evidence/`
 
+### Added
+- Automatic update feature in `modHelpMenu` (2026-11-08)
+  - Replaced browser hyperlink redirect with background download and install
+  - Downloads latest xlam from GitHub raw URL directly
+  - Verifies SHA-256 hash before installation
+  - Creates backup of existing version before overwrite
+  - Reloads add-in and prompts Excel restart
+- Updated `modVersion` to point to XLSmart-Smart-Development repository
+  - `UPDATE_JSON_URL` updated from old `xlsmart-release` repo
+  - `APP_VERSION` bumped to 1.0.3
+
 ### Fixed
 - Fixed `frmDashboard` PowerDashboard compile error (2026-11-08)
   - `btnCreateCommandButton_Click` was calling `CreateDashboard` with 7 arguments
