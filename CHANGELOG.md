@@ -8,9 +8,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 - Professional VS Code development workspace structure
-- PowerShell scripts for VBA export, import, and comparison
+- PowerShell scripts for VBA export, import, comparison and release build
+  - `scripts/Export-VBA.ps1` - Export VBA components from Excel workbook
+  - `scripts/Import-VBA.ps1` - Import changed VBA components into workbook
+  - `scripts/Compare-VBA.ps1` - Compare source files vs workbook components
+  - `scripts/Build-Release.ps1` - Validate and package release artifacts
 - Documentation and comparison reports
-- Phase 4 PowerDashboard comparison report (local source vs. embedded xlam copy): `docs/PHASE4_POWERDASHBOARD_COMPARISON.md` with evidence in `docs/phase4-evidence/` (embedded copy regeneration deferred to next approved packaging step)
+- Phase 4 PowerDashboard comparison report (local source vs. embedded xlam copy): `docs/PHASE4_POWERDASHBOARD_COMPARISON.md` with evidence in `docs/phase4-evidence/`
+
+### Changed
+- Updated `modPowerDashboardEngine` to latest version with gridlinesShow support (2026-11-08)
+  - Added gridlinesShow parameter to CreateDashboard signature
+  - Fixed currencyCode parameter name (was currencyCodeCode in old version)
+  - Added UTF-8 file writer (WriteUtf8 helper)
+  - Added error code +104 for file write validation
+  - Workbook SHA-256: `aaa784311b9e620124a5eea38d8d5e336df83fdaca178bed4095d191176be7e0`
+  - Previous SHA-256: `d95094b24b7975a4fc1f6843b7f4f8ccd140ac18fb443ca6a4b20e32f2aff294`
 
 ## [1.0.2] - 2026-07-30
 
