@@ -28,6 +28,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   - `APP_VERSION` bumped to 1.0.3
 
 ### Fixed
+- Fixed `GetDashboardTemplate` missing module compile error (2026-11-08)
+  - Root cause: `modDashTemplate.bas` was present in `src/Modules/` but never imported into `XLSmart_User.xlam`
+  - Resulted in compile error: "Sub or Function not defined" at `s = GetDashboardTemplate()`
+  - Imported `modDashTemplate` into `workbook/XLSmart_User.xlam` (3208 lines)
+- Enhanced range picker in `frmDashboard` with Ctrl+Shift+Down+Right behavior (2026-11-08)
+  - Auto-detects data table from `ActiveCell.CurrentRegion` upon form load
+  - Pre-fills `Application.InputBox(Default:=...)` with full table address so users don't have to drag
+  - Clicking a single cell or header automatically expands to full data region (Ctrl+Shift+Down+Right)
+  - Replaced hardcoded `gridlinesShow` with dynamic `cmbGridlinesComboBox` selection
 - Fixed `frmDashboard` PowerDashboard compile error (2026-11-08)
   - `btnCreateCommandButton_Click` was calling `CreateDashboard` with 7 arguments
   - Updated `modPowerDashboardEngine` requires 8 parameters (added `gridlinesShow`)
