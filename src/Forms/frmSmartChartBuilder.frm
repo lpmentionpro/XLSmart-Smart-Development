@@ -328,8 +328,8 @@ End Select
 
     On Error Resume Next
 
-    .Axes(xlCategory).TickLabels.Font.color = chartFontColor
-    .Axes(xlValue).TickLabels.Font.color = chartFontColor
+    .Axes(xlCategory).TickLabels.Font.Color = chartFontColor
+    .Axes(xlValue).TickLabels.Font.Color = chartFontColor
 
     .Axes(xlCategory).AxisTitle.Format.TextFrame2.TextRange.Font.Fill.ForeColor.RGB = chartFontColor
     .Axes(xlValue).AxisTitle.Format.TextFrame2.TextRange.Font.Fill.ForeColor.RGB = chartFontColor

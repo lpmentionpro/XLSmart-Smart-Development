@@ -1298,7 +1298,7 @@ Private Sub ExportToNewSheet()
     With ws.Range(ws.Cells(1, 1), ws.Cells(1, m_ColCount))
 
         .Font.Bold = True
-        .Interior.color = RGB(220, 230, 241)
+        .Interior.Color = RGB(220, 230, 241)
 
     End With
 

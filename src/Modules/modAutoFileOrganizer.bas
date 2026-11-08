@@ -155,8 +155,8 @@ Sub RunAutoFileOrganizer()
     With wsReport
 
         .Rows(1).Font.Bold = True
-        .Rows(1).Interior.color = RGB(90, 90, 90)
-        .Rows(1).Font.color = RGB(255, 255, 255)
+        .Rows(1).Interior.Color = RGB(90, 90, 90)
+        .Rows(1).Font.Color = RGB(255, 255, 255)
 
         .Range("A1:E" & nextRow - 1).Borders.LineStyle = xlContinuous
 

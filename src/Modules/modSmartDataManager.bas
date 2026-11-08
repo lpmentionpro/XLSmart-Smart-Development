@@ -277,7 +277,7 @@ Sub BuildSmartFilterDashboard(srcRange As Range, dashWs As Worksheet)
 
     .Fill.ForeColor.RGB = RGB(44, 62, 80)
 
-    .TextFrame.Characters.Font.color = RGB(255, 255, 255)
+    .TextFrame.Characters.Font.Color = RGB(255, 255, 255)
 
     .TextFrame.Characters.Font.Bold = True
 
@@ -325,9 +325,9 @@ Sub BuildSmartFilterDashboard(srcRange As Range, dashWs As Worksheet)
 
     .Font.Bold = True
 
-    .Interior.color = RGB(36, 64, 98)
+    .Interior.Color = RGB(36, 64, 98)
 
-    .Font.color = RGB(255, 255, 255)
+    .Font.Color = RGB(255, 255, 255)
 
     .HorizontalAlignment = xlCenter
 
@@ -721,7 +721,7 @@ Sub ShowSmartHighlighter(control As IRibbonControl)
 
         .Fill.ForeColor.RGB = RGB(44, 62, 80)
 
-        .TextFrame.Characters.Font.color = RGB(255, 255, 255)
+        .TextFrame.Characters.Font.Color = RGB(255, 255, 255)
 
         .TextFrame.Characters.Font.Bold = True
 
@@ -761,9 +761,9 @@ Sub ShowSmartHighlighter(control As IRibbonControl)
 
         .Font.Bold = True
 
-        .Interior.color = RGB(36, 64, 98)
+        .Interior.Color = RGB(36, 64, 98)
 
-        .Font.color = RGB(255, 255, 255)
+        .Font.Color = RGB(255, 255, 255)
 
         .HorizontalAlignment = xlCenter
 
@@ -822,7 +822,7 @@ Sub RunSmartHighlighter()
 
                 If LCase(g_DataRange.Cells(rw, cl).Value) Like "*" & searchTxt & "*" Then
 
-                    g_DataRange.Rows(rw).Interior.color = RGB(255, 255, 120)
+                    g_DataRange.Rows(rw).Interior.Color = RGB(255, 255, 120)
 
                     Exit For
 
@@ -858,7 +858,7 @@ Sub RunSmartHighlighter()
 
             If LCase(g_DataRange.Cells(rw, filterCol).Value) Like "*" & searchTxt & "*" Then
 
-                g_DataRange.Rows(rw).Interior.color = RGB(255, 255, 120)
+                g_DataRange.Rows(rw).Interior.Color = RGB(255, 255, 120)
 
             End If
 
@@ -911,7 +911,7 @@ Sub ExportHighlightedData()
 
     For rw = 2 To lastRow
 
-        If g_DataRange.Rows(rw).Interior.color = RGB(255, 255, 120) Then
+        If g_DataRange.Rows(rw).Interior.Color = RGB(255, 255, 120) Then
 
             g_DataRange.Rows(rw).Copy _
             exportWs.Rows(nextRow)
@@ -1130,7 +1130,7 @@ Sub SetupSmartMaskingDashboard(srcRange As Range)
 
     .Fill.ForeColor.RGB = RGB(52, 152, 219)
 
-    .TextFrame.Characters.Font.color = RGB(255, 255, 255)
+    .TextFrame.Characters.Font.Color = RGB(255, 255, 255)
 
     .TextFrame.Characters.Font.Bold = True
 
@@ -1160,7 +1160,7 @@ Sub SetupSmartMaskingDashboard(srcRange As Range)
 
     .Fill.ForeColor.RGB = RGB(44, 62, 80)
 
-    .TextFrame.Characters.Font.color = RGB(255, 255, 255)
+    .TextFrame.Characters.Font.Color = RGB(255, 255, 255)
 
     .TextFrame.Characters.Font.Bold = True
 
@@ -1205,9 +1205,9 @@ Sub SetupSmartMaskingDashboard(srcRange As Range)
 
         .Font.Bold = True
 
-        .Interior.color = RGB(36, 64, 98)
+        .Interior.Color = RGB(36, 64, 98)
 
-        .Font.color = RGB(255, 255, 255)
+        .Font.Color = RGB(255, 255, 255)
 
         .HorizontalAlignment = xlCenter
 

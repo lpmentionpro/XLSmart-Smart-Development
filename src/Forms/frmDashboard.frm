@@ -13,7 +13,6 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-
 Option Explicit
 
 Private mHeaderRow As Long
@@ -40,7 +39,7 @@ Private Sub UserForm_Initialize()
         .AddItem "India (INR)"
         .AddItem "Europe (EUR)"
         .AddItem "International (USD)"
-        .ListIndex = 0
+        .ListIndex = 1
     End With
 
     With cmbGridlinesComboBox
@@ -173,35 +172,23 @@ End Sub
 
 Private Sub PickMultipleSheets()
 
-    ' Sheet picker built with Application.InputBox - no extra form needed,
-    ' jate project compile-e kono missing reference na ashe.
-    Dim ans As Variant
-    Dim sheetText As String
-
     If ActiveWorkbook Is Nothing Then
         MsgBox "No active workbook found.", vbExclamation
         Exit Sub
     End If
 
-    ans = Application.InputBox( _
-        prompt:="Enter sheet numbers separated by comma (example: 1,2,3).", _
-        Title:="Select Sheets", _
-        Type:=2)
+    frmSheetPicker.Show vbModal
 
-    If ans = False Then
+    If frmSheetPicker.WasCancelled Then
+
         lblStatusLabel.Caption = "No sheets selected."
+        Unload frmSheetPicker
         Exit Sub
+
     End If
 
-    sheetText = Trim$(CStr(ans))
-
-    If sheetText = "" Then
-        lblStatusLabel.Caption = "No sheets selected."
-        Exit Sub
-    End If
-
-    txtSheets.text = sheetText
-    mHeaderRow = 1
+    txtSheets.text = frmSheetPicker.SelectedSheetIndexes
+    mHeaderRow = frmSheetPicker.headerRow
 
     txtRangeTextBox.Tag = txtSheets.text
 
@@ -213,6 +200,8 @@ Private Sub PickMultipleSheets()
     lblStatusLabel.Caption = _
         CountSelectedSheets(txtSheets.text) & _
         " sheets selected"
+
+    Unload frmSheetPicker
 
 End Sub
 
@@ -244,7 +233,6 @@ Private Sub btnCreateCommandButton_Click()
     Dim themeName As String
     Dim currencyName As String
     Dim dataInput As String
-    Dim showGrid As Boolean
 
     If Trim(txtTitleTextBox.text) = "" Then
         MsgBox "Please enter dashboard title.", vbExclamation
@@ -292,9 +280,6 @@ Private Sub btnCreateCommandButton_Click()
         Case Else: currencyName = ""
     End Select
 
-    ' cmbGridlinesComboBox: 0 = Show, 1 = Hide
-    showGrid = (cmbGridlinesComboBox.ListIndex <> 1)
-
     lblStatusLabel.Caption = "Creating dashboard..."
     btnCreateCommandButton.Enabled = False
 
@@ -309,8 +294,7 @@ Private Sub btnCreateCommandButton_Click()
     radiooptMultiOptionButton.Value, _
     dataInput, _
     mHeaderRow, _
-    chkSmartLockCheckBox.Value, _
-    showGrid
+    chkSmartLockCheckBox.Value
 
     Unload Me
     Exit Sub

@@ -46,9 +46,9 @@ Public Sub GenerateSheetIndex(control As IRibbonControl)
         .Font.Size = 15
         .Font.Bold = True
 
-        .Font.color = RGB(255, 255, 255)
+        .Font.Color = RGB(255, 255, 255)
 
-        .Interior.color = RGB(36, 74, 140)
+        .Interior.Color = RGB(36, 74, 140)
 
     End With
 
@@ -65,9 +65,9 @@ Public Sub GenerateSheetIndex(control As IRibbonControl)
         .Font.Size = 9
         .Font.Italic = True
 
-        .Font.color = RGB(90, 90, 90)
+        .Font.Color = RGB(90, 90, 90)
 
-        .Interior.color = RGB(240, 244, 250)
+        .Interior.Color = RGB(240, 244, 250)
 
     End With
 
@@ -98,9 +98,9 @@ Public Sub GenerateSheetIndex(control As IRibbonControl)
             .Font.Size = 10
             .Font.Bold = True
 
-            .Font.color = RGB(255, 255, 255)
+            .Font.Color = RGB(255, 255, 255)
 
-            .Interior.color = RGB(56, 96, 170)
+            .Interior.Color = RGB(56, 96, 170)
 
             .HorizontalAlignment = xlCenter
             .VerticalAlignment = xlCenter
@@ -143,7 +143,7 @@ Public Sub GenerateSheetIndex(control As IRibbonControl)
 
             .Value = serialNo
 
-            .Interior.color = bg
+            .Interior.Color = bg
 
             .Font.Name = "Segoe UI"
             .Font.Size = 10
@@ -156,7 +156,7 @@ Public Sub GenerateSheetIndex(control As IRibbonControl)
         ' SHEET NAME
         ' ----------------------------------------
 
-        idx.Cells(dataRow, 2).Interior.color = bg
+        idx.Cells(dataRow, 2).Interior.Color = bg
 
         idx.Hyperlinks.Add _
             Anchor:=idx.Cells(dataRow, 2), _
@@ -169,7 +169,7 @@ Public Sub GenerateSheetIndex(control As IRibbonControl)
             .Font.Name = "Segoe UI"
             .Font.Size = 10
 
-            .Font.color = RGB(0, 70, 140)
+            .Font.Color = RGB(0, 70, 140)
 
         End With
 
@@ -191,7 +191,7 @@ Public Sub GenerateSheetIndex(control As IRibbonControl)
 
             .Value = totalRows
 
-            .Interior.color = bg
+            .Interior.Color = bg
 
             .HorizontalAlignment = xlCenter
 
@@ -201,7 +201,7 @@ Public Sub GenerateSheetIndex(control As IRibbonControl)
 
             .Value = totalCols
 
-            .Interior.color = bg
+            .Interior.Color = bg
 
             .HorizontalAlignment = xlCenter
 
@@ -213,18 +213,18 @@ Public Sub GenerateSheetIndex(control As IRibbonControl)
 
         With idx.Cells(dataRow, 5)
 
-       .Interior.color = bg
+       .Interior.Color = bg
        .HorizontalAlignment = xlCenter
 
          If ws.ProtectContents Then
 
         .Value = "Protected"
-        .Font.color = RGB(190, 0, 0)
+        .Font.Color = RGB(190, 0, 0)
 
     Else
 
         .Value = "Unprotected"
-        .Font.color = RGB(0, 128, 0)
+        .Font.Color = RGB(0, 128, 0)
 
     End If
 
@@ -236,19 +236,19 @@ End With
 
         With idx.Cells(dataRow, 6)
 
-            .Interior.color = bg
+            .Interior.Color = bg
 
             .HorizontalAlignment = xlCenter
 
             If ws.Visible = xlSheetVisible Then
 
                 .Value = "Visible"
-                .Font.color = RGB(0, 128, 0)
+                .Font.Color = RGB(0, 128, 0)
 
             Else
 
                 .Value = "Hidden"
-                .Font.color = RGB(190, 0, 0)
+                .Font.Color = RGB(190, 0, 0)
 
             End If
 
@@ -258,11 +258,11 @@ End With
         ' ACTION BG
         ' ----------------------------------------
 
-        idx.Cells(dataRow, 7).Interior.color = bg
+        idx.Cells(dataRow, 7).Interior.Color = bg
 
         ' hidden sheet name
         idx.Cells(dataRow, 7).Value = ws.Name
-        idx.Cells(dataRow, 7).Font.color = bg
+        idx.Cells(dataRow, 7).Font.Color = bg
 
         ' ----------------------------------------
         ' DELETE BUTTON
@@ -317,7 +317,7 @@ skipSheet:
 
         .Borders.LineStyle = xlContinuous
 
-        .Borders.color = RGB(210, 220, 235)
+        .Borders.Color = RGB(210, 220, 235)
 
         .Borders.Weight = xlThin
 
@@ -382,12 +382,12 @@ Public Sub GenerateSheetGallery(control As IRibbonControl)
         .Font.Size = 18
         .Font.Bold = True
 
-        .Font.color = RGB(35, 35, 35)
+        .Font.Color = RGB(35, 35, 35)
 
         .HorizontalAlignment = xlCenter
         .VerticalAlignment = xlCenter
 
-        .Interior.color = RGB(236, 241, 255)
+        .Interior.Color = RGB(236, 241, 255)
 
     End With
 
@@ -400,19 +400,19 @@ Public Sub GenerateSheetGallery(control As IRibbonControl)
         .Font.Size = 10
         .Font.Italic = True
 
-        .Font.color = RGB(120, 120, 145)
+        .Font.Color = RGB(120, 120, 145)
 
         .HorizontalAlignment = xlCenter
         .VerticalAlignment = xlCenter
 
-        .Interior.color = RGB(236, 241, 255)
+        .Interior.Color = RGB(236, 241, 255)
 
     End With
 
     With gal.Range("B3:AO3").Borders(xlEdgeBottom)
 
         .LineStyle = xlContinuous
-        .color = RGB(190, 200, 225)
+        .Color = RGB(190, 200, 225)
         .Weight = xlThin
 
     End With
@@ -456,7 +456,7 @@ Public Sub GenerateSheetGallery(control As IRibbonControl)
             gal.Cells(row0, col0), _
             gal.Cells(row0 + CARD_ROWS - 1, col1))
 
-            .Interior.color = RGB(252, 253, 255)
+            .Interior.Color = RGB(252, 253, 255)
 
         End With
 
@@ -475,7 +475,7 @@ Public Sub GenerateSheetGallery(control As IRibbonControl)
             .Borders(xlEdgeTop).Weight = xlMedium
             .Borders(xlEdgeBottom).Weight = xlMedium
 
-            .Borders.color = RGB(185, 195, 225)
+            .Borders.Color = RGB(185, 195, 225)
 
         End With
 
@@ -485,7 +485,7 @@ Public Sub GenerateSheetGallery(control As IRibbonControl)
             gal.Cells(row0 + 1, col1))
 
             .Merge
-            .Interior.color = RGB(92, 130, 255)
+            .Interior.Color = RGB(92, 130, 255)
 
         End With
 
@@ -497,7 +497,7 @@ Public Sub GenerateSheetGallery(control As IRibbonControl)
             .Font.Size = 8
             .Font.Bold = True
 
-            .Font.color = RGB(255, 255, 255)
+            .Font.Color = RGB(255, 255, 255)
 
             .HorizontalAlignment = xlLeft
             .VerticalAlignment = xlCenter
@@ -537,12 +537,12 @@ Public Sub GenerateSheetGallery(control As IRibbonControl)
                     .Font.Name = "Segoe UI"
                     .Font.Size = 6
 
-                    .Font.color = RGB(70, 70, 95)
+                    .Font.Color = RGB(70, 70, 95)
 
                     If pr Mod 2 = 0 Then
-                        .Interior.color = RGB(247, 249, 255)
+                        .Interior.Color = RGB(247, 249, 255)
                     Else
-                        .Interior.color = RGB(255, 255, 255)
+                        .Interior.Color = RGB(255, 255, 255)
                     End If
 
                 End With
@@ -557,7 +557,7 @@ Public Sub GenerateSheetGallery(control As IRibbonControl)
             gal.Cells(row0 + 2 + PREV_ROWS - 1, col1))
 
             .Borders.LineStyle = xlContinuous
-            .Borders.color = RGB(222, 228, 240)
+            .Borders.Color = RGB(222, 228, 240)
             .Borders.Weight = xlThin
 
         End With

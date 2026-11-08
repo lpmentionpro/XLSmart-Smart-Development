@@ -26,7 +26,7 @@ End Sub
 Private Sub ApplyHighlightBorder(borderRGB As Long)
     With Selection.Borders
         .LineStyle = xlContinuous
-        .color = borderRGB
+        .Color = borderRGB
         .Weight = xlMedium
     End With
 End Sub
@@ -64,14 +64,14 @@ Public Sub IncreaseColourHelper()
     Dim clr As Long
     For Each c In Selection.Cells
         If c.Interior.ColorIndex <> xlNone Then
-            clr = c.Interior.color
+            clr = c.Interior.Color
             b = (clr \ 65536) And 255
             g = (clr \ 256) And 255
             r = clr And 255
             r = Application.WorksheetFunction.Min(r + 30, 255)
             g = Application.WorksheetFunction.Min(g + 30, 255)
             b = Application.WorksheetFunction.Min(b + 30, 255)
-            c.Interior.color = RGB(r, g, b)
+            c.Interior.Color = RGB(r, g, b)
         End If
     Next c
 End Sub
@@ -82,14 +82,14 @@ Public Sub DecreaseColourHelper()
     Dim clr As Long
     For Each c In Selection.Cells
         If c.Interior.ColorIndex <> xlNone Then
-            clr = c.Interior.color
+            clr = c.Interior.Color
             b = (clr \ 65536) And 255
             g = (clr \ 256) And 255
             r = clr And 255
             r = Application.WorksheetFunction.Max(r - 30, 0)
             g = Application.WorksheetFunction.Max(g - 30, 0)
             b = Application.WorksheetFunction.Max(b - 30, 0)
-            c.Interior.color = RGB(r, g, b)
+            c.Interior.Color = RGB(r, g, b)
         End If
     Next c
 End Sub
@@ -103,8 +103,8 @@ Private Sub ApplyTickmark(sym As String, bgRGB As Long, fgRGB As Long)
     For Each c In Selection.Cells
         With c
             .Value = sym
-            .Interior.color = bgRGB
-            .Font.color = fgRGB
+            .Interior.Color = bgRGB
+            .Font.Color = fgRGB
             .Font.Name = "Segoe UI"
             .Font.Size = 11
             .HorizontalAlignment = xlCenter
@@ -174,7 +174,7 @@ Public Sub Tickmark_RemoveAll(control As IRibbonControl)
     For Each c In Selection.Cells
         c.ClearContents
         c.Interior.ColorIndex = xlColorIndexNone
-        c.Font.color = RGB(0, 0, 0)
+        c.Font.Color = RGB(0, 0, 0)
     Next c
 End Sub
 
@@ -853,11 +853,11 @@ Public Sub PaintFocusCell()
 
         For i = 1 To prevRow.Cells.count
 
-            prevRowColors(i) = prevRow.Cells(i).DisplayFormat.Interior.color
+            prevRowColors(i) = prevRow.Cells(i).DisplayFormat.Interior.Color
 
             ' header skip
             If prevRow.Cells(i).Row > 1 Then
-                prevRow.Cells(i).Interior.color = focusColor
+                prevRow.Cells(i).Interior.Color = focusColor
             End If
 
         Next i
@@ -871,13 +871,13 @@ Public Sub PaintFocusCell()
 
         For i = 1 To prevCol.Cells.count
 
-            prevColColors(i) = prevCol.Cells(i).DisplayFormat.Interior.color
+            prevColColors(i) = prevCol.Cells(i).DisplayFormat.Interior.Color
 
             ' skip header + avoid intersection overwrite
             If prevCol.Cells(i).Row > 1 _
             And prevCol.Cells(i).Row <> ActiveCell.Row Then
 
-                prevCol.Cells(i).Interior.color = focusColor
+                prevCol.Cells(i).Interior.Color = focusColor
 
             End If
 
@@ -908,7 +908,7 @@ Public Sub FocusCell_Clear()
     If Not prevRow Is Nothing Then
 
         For i = 1 To prevRow.Cells.count
-            prevRow.Cells(i).Interior.color = prevRowColors(i)
+            prevRow.Cells(i).Interior.Color = prevRowColors(i)
         Next i
 
     End If
@@ -921,10 +921,10 @@ Public Sub FocusCell_Clear()
             Set c = prevCol.Cells(i)
 
             If prevRow Is Nothing Then
-                c.Interior.color = prevColColors(i)
+                c.Interior.Color = prevColColors(i)
             Else
                 If Intersect(c, prevRow) Is Nothing Then
-                    c.Interior.color = prevColColors(i)
+                    c.Interior.Color = prevColColors(i)
                 End If
             End If
 
