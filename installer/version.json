@@ -1,4 +1,5 @@
 {
-    "version": "1.0.2",
-    "download_url": "https://raw.githubusercontent.com/lpmentionpro/xlsmart-release/main/release/XLSmart_User.xlam"
+    "version": "1.0.3",
+    "download_url": "https://raw.githubusercontent.com/lpmentionpro/XLSmart-Smart-Development/main/workbook/XLSmart_User.xlam",
+    "sha256": "aaa784311b9e620124a5eea38d8d5e336df83fdaca178bed4095d191176be7e0"
 }
