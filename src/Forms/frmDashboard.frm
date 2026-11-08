@@ -294,7 +294,8 @@ Private Sub btnCreateCommandButton_Click()
     radiooptMultiOptionButton.Value, _
     dataInput, _
     mHeaderRow, _
-    chkSmartLockCheckBox.Value
+    chkSmartLockCheckBox.Value, _
+    True
 
     Unload Me
     Exit Sub
