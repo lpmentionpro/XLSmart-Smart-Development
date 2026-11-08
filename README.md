@@ -22,11 +22,11 @@ xlsmart-development/
 
 | Type       | Count | Location        |
 |------------|-------|-----------------|
-| Modules    | 20    | `src/Modules/`  |
+| Modules    | 19    | `src/Modules/`  |
 | Classes    | 2     | `src/Classes/`  |
 | UserForms  | 11    | `src/Forms/`    |
 | `.frx`     | 11    | `src/Forms/`    |
-| **Total**  | **44** | `src/`         |
+| **Total**  | **43** | `src/`         |
 
 ## Key Files
 

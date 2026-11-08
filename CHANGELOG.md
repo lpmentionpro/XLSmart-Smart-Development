@@ -28,30 +28,27 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   - `APP_VERSION` bumped to 1.0.3
 
 ### Fixed
-- Fixed `GetDashboardTemplate` missing module compile error (2026-11-08)
-  - Root cause: `modDashTemplate.bas` was present in `src/Modules/` but never imported into `XLSmart_User.xlam`
-  - Resulted in compile error: "Sub or Function not defined" at `s = GetDashboardTemplate()`
-  - Imported `modDashTemplate` into `workbook/XLSmart_User.xlam` (3208 lines)
-- Enhanced range picker in `frmDashboard` with Ctrl+Shift+Down+Right behavior (2026-11-08)
-  - Auto-detects data table from `ActiveCell.CurrentRegion` upon form load
-  - Pre-fills `Application.InputBox(Default:=...)` with full table address so users don't have to drag
-  - Clicking a single cell or header automatically expands to full data region (Ctrl+Shift+Down+Right)
-  - Replaced hardcoded `gridlinesShow` with dynamic `cmbGridlinesComboBox` selection
+- Replaced truncated `modDashTemplate` with self-contained `BuildDashboardHTML` in `modPowerDashboardEngine` (2026-11-09)
+  - Root cause: `modDashTemplate.bas` in the repository was incomplete/truncated at line 3209 inside `Sec08_HeaderLogo_14()`, causing compile error "Sub or Function not defined" on `Sec08_HeaderLogo_15()`
+  - Restored full, self-contained HTML dashboard builder in `modPowerDashboardEngine.bas` (306 lines) with `gridlinesShow`, `smartLock`, multi-currency support, and UTF-8 encoding
+  - Completely removed broken `modDashTemplate.bas` from source and workbook
+- Enabled manual range selection in `frmDashboard` with Ctrl+Shift+Down/Right (2026-11-09)
+  - Updated `PickSingleTableRange` to allow natural manual selection via keyboard (`Ctrl+Shift+Down` and `Ctrl+Shift+Right`) or mouse drag
+  - Removed forced single-cell auto-expansion and pre-filled defaults that interfered with keyboard selection
 - Fixed `frmDashboard` PowerDashboard compile error (2026-11-08)
   - `btnCreateCommandButton_Click` was calling `CreateDashboard` with 7 arguments
   - Updated `modPowerDashboardEngine` requires 8 parameters (added `gridlinesShow`)
-  - Added missing `gridlinesShow = True` as 8th argument
+  - Added missing `gridlinesShow` as 8th argument
   - Compile error "Argument not optional" now resolved
   - Form imported into workbook via `Import-VBA.ps1`
 
 ### Changed
-- Updated `modPowerDashboardEngine` to latest version with gridlinesShow support (2026-11-08)
+- Updated `modPowerDashboardEngine` to self-contained engine with gridlinesShow support (2026-11-09)
   - Added gridlinesShow parameter to CreateDashboard signature
   - Fixed currencyCode parameter name (was currencyCodeCode in old version)
   - Added UTF-8 file writer (WriteUtf8 helper)
   - Added error code +104 for file write validation
-  - Workbook SHA-256: `aaa784311b9e620124a5eea38d8d5e336df83fdaca178bed4095d191176be7e0`
-  - Previous SHA-256: `d95094b24b7975a4fc1f6843b7f4f8ccd140ac18fb443ca6a4b20e32f2aff294`
+  - Workbook SHA-256: `D961FE5AAFC03D90F8E7824C05A1D8CDB1FA2563D8DB3AB6320A7727FC1C19EE`
 
 ## [1.0.2] - 2026-07-30
 

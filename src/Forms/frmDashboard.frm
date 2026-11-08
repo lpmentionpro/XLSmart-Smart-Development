@@ -70,19 +70,6 @@ Private Sub UserForm_Initialize()
 
     UpdateDataSourceUI
 
-    ' Auto-detect data range from ActiveCell (Ctrl+Shift+Down+Right)
-    On Error Resume Next
-    If Not ActiveCell Is Nothing Then
-        If ActiveCell.CurrentRegion.Rows.count >= 2 And ActiveCell.CurrentRegion.Columns.count >= 1 Then
-            Dim initRng As Range
-            Set initRng = ActiveCell.CurrentRegion
-            txtRangeTextBox.Value = initRng.Worksheet.Name & "!" & initRng.Address(False, False)
-            txtRangeTextBox.Tag = initRng.Worksheet.Parent.Name & "|" & initRng.Worksheet.Name & "|" & initRng.Address(False, False)
-            lblStatusLabel.Caption = "Auto-detected: " & (initRng.Rows.count - 1) & " data rows"
-        End If
-    End If
-    On Error GoTo 0
-
 End Sub
 
 Private Sub radiooptSingleOptionButton_Click()
@@ -107,7 +94,7 @@ Private Sub UpdateDataSourceUI()
 
     If radiooptSingleOptionButton.Value = True Then
         lblStatusLabel.Caption = _
-            "Click Pick and select any cell inside your data table."
+            "Click Pick and select range with mouse or Ctrl+Shift+Down+Right."
     Else
         lblStatusLabel.Caption = _
             "Click Pick and select sheets."
@@ -128,29 +115,14 @@ End Sub
 Private Sub PickSingleTableRange()
 
     Dim selected_rng As Range
-    Dim final_rng As Range
-    Dim defaultAddr As String
-
-    ' Smart default from ActiveCell (Ctrl+Shift+Down+Right region)
-    On Error Resume Next
-    If Not ActiveCell Is Nothing Then
-        If ActiveCell.CurrentRegion.Cells.count > 1 Then
-            defaultAddr = ActiveCell.CurrentRegion.Address(False, False)
-        Else
-            defaultAddr = ActiveCell.Address(False, False)
-        End If
-    End If
-    On Error GoTo 0
 
     Me.Hide
     DoEvents
 
     On Error Resume Next
     Set selected_rng = Application.InputBox( _
-        prompt:="Click any cell inside your table or select range." & vbCrLf & _
-                "Tip: Click 1 cell or header to auto-select whole table (Ctrl+Shift+Down+Right).", _
+        prompt:="Select table range using mouse or keyboard (Ctrl+Shift+Down / Ctrl+Shift+Right):", _
         Title:="Select Data Range", _
-        Default:=defaultAddr, _
         Type:=8)
     On Error GoTo 0
 
@@ -166,60 +138,26 @@ Private Sub PickSingleTableRange()
         Exit Sub
     End If
 
-    ' Smart auto-expand (Ctrl+Shift+Down+Right behavior)
-    Dim ws As Worksheet
-    Set ws = selected_rng.Worksheet
-    Dim startCell As Range
-    Set startCell = selected_rng.Cells(1, 1)
-
-    If selected_rng.Cells.count = 1 Then
-        ' 1 cell clicked -> auto-expand to full CurrentRegion
-        If startCell.CurrentRegion.Rows.count >= 2 Then
-            Set final_rng = startCell.CurrentRegion
-        Else
-            ' Fallback to Ctrl+Shift+Down & Ctrl+Shift+Right
-            Dim lastR As Long, lastC As Long
-            lastR = ws.Cells(ws.Rows.count, startCell.Column).End(xlUp).Row
-            lastC = ws.Cells(startCell.Row, ws.Columns.count).End(xlToLeft).Column
-            If lastR >= startCell.Row And lastC >= startCell.Column Then
-                Set final_rng = ws.Range(startCell, ws.Cells(lastR, lastC))
-            Else
-                Set final_rng = startCell
-            End If
-        End If
-    ElseIf selected_rng.Rows.count = 1 And selected_rng.Columns.count > 1 Then
-        ' Header row selected -> auto-expand down (Ctrl+Shift+Down)
-        Dim maxR As Long
-        maxR = ws.Cells(ws.Rows.count, startCell.Column).End(xlUp).Row
-        If maxR > startCell.Row Then
-            Set final_rng = ws.Range(startCell, ws.Cells(maxR, selected_rng.Cells(1, selected_rng.Columns.count).Column))
-        Else
-            Set final_rng = selected_rng
-        End If
-    Else
-        Set final_rng = selected_rng
-    End If
-
-    If final_rng.Rows.count < 2 Then
-        MsgBox "Please include headers and at least one data row.", vbExclamation
+    If selected_rng.Rows.count < 2 Or selected_rng.Columns.count < 1 Then
+        MsgBox "Please select a range with headers and at least one data row (use Ctrl+Shift+Down / Ctrl+Shift+Right).", vbExclamation
         Me.Show
         Exit Sub
     End If
 
     txtRangeTextBox.Value = _
-        final_rng.Worksheet.Name & "!" & _
-        final_rng.Address(False, False)
+        selected_rng.Worksheet.Name & "!" & _
+        selected_rng.Address(False, False)
 
     ' Workbook|Sheet|Range
     txtRangeTextBox.Tag = _
-        final_rng.Worksheet.Parent.Name & "|" & _
-        final_rng.Worksheet.Name & "|" & _
-        final_rng.Address(False, False)
+        selected_rng.Worksheet.Parent.Name & "|" & _
+        selected_rng.Worksheet.Name & "|" & _
+        selected_rng.Address(False, False)
 
     lblStatusLabel.Caption = _
         "Range Selected: " & _
-        final_rng.Rows.count - 1 & _
-        " data rows"
+        (selected_rng.Rows.count - 1) & _
+        " data rows (" & selected_rng.Address(False, False) & ")"
 
     Me.Show
 
