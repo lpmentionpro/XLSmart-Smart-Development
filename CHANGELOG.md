@@ -16,6 +16,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Documentation and comparison reports
 - Phase 4 PowerDashboard comparison report (local source vs. embedded xlam copy): `docs/PHASE4_POWERDASHBOARD_COMPARISON.md` with evidence in `docs/phase4-evidence/`
 
+### Fixed
+- Fixed `frmDashboard` PowerDashboard compile error (2026-11-08)
+  - `btnCreateCommandButton_Click` was calling `CreateDashboard` with 7 arguments
+  - Updated `modPowerDashboardEngine` requires 8 parameters (added `gridlinesShow`)
+  - Added missing `gridlinesShow = True` as 8th argument
+  - Compile error "Argument not optional" now resolved
+  - Form imported into workbook via `Import-VBA.ps1`
+
 ### Changed
 - Updated `modPowerDashboardEngine` to latest version with gridlinesShow support (2026-11-08)
   - Added gridlinesShow parameter to CreateDashboard signature
