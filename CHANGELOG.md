@@ -50,7 +50,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Updated installer download URL to GitHub release repo
 
 ### Notes
-- `installer/version.json` points to `https://raw.githubusercontent.com/lpmentionpro/xlsmart-release/main/release/XLSmart_User.xlam`
+- `installer/version.json` points to `https://raw.githubusercontent.com/lpmentionpro/XLSmart-Smart-Development/main/workbook/XLSmart_User.xlam`
 
 ## [1.0.1] - Unknown
 
@@ -60,5 +60,5 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Initial release of XLSmart Excel VBA Add-in.
 
-[Unreleased]: https://github.com/lpmentionpro/xlsmart-release/compare/v1.0.2...HEAD
-[1.0.2]: https://github.com/lpmentionpro/xlsmart-release/releases/tag/v1.0.2
+[Unreleased]: https://github.com/lpmentionpro/XLSmart-Smart-Development/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/lpmentionpro/XLSmart-Smart-Development/releases/tag/v1.0.2
