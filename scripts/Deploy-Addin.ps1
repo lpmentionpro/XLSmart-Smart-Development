@@ -22,8 +22,9 @@ if ($excelProc) {
 
 try {
     Copy-Item -Path $source -Destination $destination -Force
-    Write-Host "[SUCCESS] Add-in successfully updated to v1.0.3!" -ForegroundColor Green
-    Write-Host "New SHA-256: $((Get-FileHash -Path $destination -Algorithm SHA256).Hash)"
+    $deployedHash = (Get-FileHash -Path $destination -Algorithm SHA256).Hash
+    Write-Host "[SUCCESS] Add-in successfully updated." -ForegroundColor Green
+    Write-Host "New SHA-256: $deployedHash"
 } catch {
     Write-Host "[ERROR] Could not copy file: $($_.Exception.Message)" -ForegroundColor Red
     Write-Host "Please close Excel and run this script again." -ForegroundColor Yellow

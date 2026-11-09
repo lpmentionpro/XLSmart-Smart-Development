@@ -11,7 +11,7 @@ End Sub
 ' Power Dashboard button
 Public Sub Ribbon_OpenPowerDashboard(control As IRibbonControl)
 
-    frmDashboard.Show
+    frmDashboard.Show vbModeless
 
 End Sub
 

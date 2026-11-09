@@ -16,6 +16,7 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private mHeaderRow As Long
+Private mSelectingRange As Boolean
 
 Private Sub UserForm_Initialize()
 
@@ -89,6 +90,9 @@ Private Sub UpdateDataSourceUI()
     txtRangeTextBox.text = ""
     txtRangeTextBox.Tag = ""
 
+    mSelectingRange = False
+    btnPickRangeCommandButton.Caption = "Pick Range"
+
     txtSheets.text = ""
     mHeaderRow = 1
 
@@ -116,50 +120,48 @@ Private Sub PickSingleTableRange()
 
     Dim selected_rng As Range
 
-    Me.Hide
-    DoEvents
+    ' Two-step modeless selection avoids the InputBox reference-field focus trap.
+    ' The user selects directly on the worksheet, then clicks this button again.
+    If Not mSelectingRange Then
+        mSelectingRange = True
+        btnPickRangeCommandButton.Caption = "Use Selected Range"
+        lblStatusLabel.Caption = _
+            "Select the full range on the sheet: click the first header, press Ctrl+Shift+Down, then Ctrl+Shift+Right. Click Use Selected Range when done."
+        Exit Sub
+    End If
 
     On Error Resume Next
-    Set selected_rng = Application.InputBox( _
-        prompt:="Select table range using mouse or keyboard (Ctrl+Shift+Down / Ctrl+Shift+Right):", _
-        Title:="Select Data Range", _
-        Type:=8)
+    If TypeName(Application.Selection) = "Range" Then
+        Set selected_rng = Application.Selection
+    End If
     On Error GoTo 0
 
     If selected_rng Is Nothing Then
-        lblStatusLabel.Caption = "No range selected."
-        Me.Show
+        lblStatusLabel.Caption = "Select a cell range on the worksheet first."
         Exit Sub
     End If
 
-    If selected_rng.Areas.count > 1 Then
+    If selected_rng.Areas.Count > 1 Then
         MsgBox "Please select one continuous range only.", vbExclamation
-        Me.Show
         Exit Sub
     End If
 
-    If selected_rng.Rows.count < 2 Or selected_rng.Columns.count < 1 Then
-        MsgBox "Please select a range with headers and at least one data row (use Ctrl+Shift+Down / Ctrl+Shift+Right).", vbExclamation
-        Me.Show
+    If selected_rng.Rows.Count < 2 Or selected_rng.Columns.Count < 1 Then
+        MsgBox "Select the header row and at least one data row. Start at the first header, then use Ctrl+Shift+Down and Ctrl+Shift+Right.", vbExclamation
         Exit Sub
     End If
 
-    txtRangeTextBox.Value = _
-        selected_rng.Worksheet.Name & "!" & _
-        selected_rng.Address(False, False)
+    txtRangeTextBox.Value = selected_rng.Worksheet.Name & "!" & _
+                            selected_rng.Address(False, False)
+    txtRangeTextBox.Tag = selected_rng.Worksheet.Parent.Name & "|" & _
+                          selected_rng.Worksheet.Name & "|" & _
+                          selected_rng.Address(False, False)
 
-    ' Workbook|Sheet|Range
-    txtRangeTextBox.Tag = _
-        selected_rng.Worksheet.Parent.Name & "|" & _
-        selected_rng.Worksheet.Name & "|" & _
-        selected_rng.Address(False, False)
-
-    lblStatusLabel.Caption = _
-        "Range Selected: " & _
-        (selected_rng.Rows.count - 1) & _
-        " data rows (" & selected_rng.Address(False, False) & ")"
-
-    Me.Show
+    mSelectingRange = False
+    btnPickRangeCommandButton.Caption = "Pick Range"
+    lblStatusLabel.Caption = "Range Selected: " & _
+                             (selected_rng.Rows.Count - 1) & _
+                             " data rows (" & selected_rng.Address(False, False) & ")"
 
 End Sub
 
