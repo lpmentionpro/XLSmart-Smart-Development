@@ -34,7 +34,7 @@ xlsmart-development/
 - **VBA export source of truth**: `%APPDATA%\Microsoft\AddIns\VBA_Export`
 - **Working copy**: `workbook/XLSmart_User.xlam`
 - **Installer**: `installer/XLSmart_Installer.xlsm`
-- **Version**: `installer/version.json` (v1.0.4)
+- **Version**: `installer/version.json` (v1.0.5)
 - **GitHub Repository**: https://github.com/lpmentionpro/XLSmart-Smart-Development
 
 ## Scripts

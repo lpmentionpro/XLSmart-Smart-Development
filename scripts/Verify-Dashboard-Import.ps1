@@ -17,10 +17,14 @@ try {
     $ribbonText = $ribbon.Lines(1, $ribbon.CountOfLines)
     $formText = $form.Lines(1, $form.CountOfLines)
 
+    $templatePath = Join-Path (Resolve-Path '.').Path 'assets\PowerDashboardTemplate.html'
+    $templateText = if (Test-Path $templatePath) { [System.IO.File]::ReadAllText($templatePath) } else { '' }
+
     $checks = [ordered]@{
-        'Corrected chart label generator' = $engineText.Contains('let labs=a.map')
-        'Corrected CSS color value' = $engineText.Contains('rgba(255,255,255,.68)') -and -not $engineText.Contains('rgba(255,255,268,.68)')
-        'Explicit dashboard DOM lookups' = $engineText.Contains("const currencyCodeSel=`$('currencyCodeSel')")
+        'Professional dashboard template is bundled' = $templateText.Length -gt 800000
+        'Template has data injection hooks' = $templateText.Contains('/*--RAWDATA_START--*/') -and $templateText.Contains('/*--AICONFIG_START--*/')
+        'VBA injects Excel data into template' = $engineText.Contains('ReplaceTemplateSection') -and $engineText.Contains('let rawData = ')
+        'VBA can cache the template after update' = $engineText.Contains('DownloadDashboardTemplate') -and $engineText.Contains('assets/PowerDashboardTemplate.html')
         'Modeless dashboard form' = $ribbonText.Contains('frmDashboard.Show vbModeless')
         'Manual worksheet picker mode' = $formText.Contains('mSelectingRange') -and $formText.Contains('Use Selected Range') -and -not $formText.Contains('Application.InputBox')
     }

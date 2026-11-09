@@ -7,6 +7,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- PowerDashboardTemplate-based browser dashboard (2026-11-09)
+  - Bundles the full interactive dashboard template in `assets/PowerDashboardTemplate.html`
+  - Injects selected Excel data and dashboard settings into the template at runtime
+  - Deploys and caches the template beside the add-in, with a GitHub fallback for in-app updates
+  - Includes GridStack layouts, ECharts charts, 3D animated background, KPI cards, slicers, logo tools, and dashboard save/export controls
 - Professional VS Code development workspace structure
 - PowerShell scripts for VBA export, import, comparison and release build
   - `scripts/Export-VBA.ps1` - Export VBA components from Excel workbook

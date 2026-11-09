@@ -88,7 +88,9 @@ if (-not $Quiet) {
 # Apply filter
 if ($ComponentFilter -and $ComponentFilter.Count -gt 0) {
     $Filtered = @{}
-    foreach ($Name in $ComponentFilter) {
+    # Support both PowerShell array arguments and comma-separated values passed by a shell.
+    $RequestedComponents = $ComponentFilter -split ','
+    foreach ($Name in $RequestedComponents) {
         $Name = $Name.Trim()
         if ($SourceMap.ContainsKey($Name)) {
             $Filtered[$Name] = $SourceMap[$Name]
