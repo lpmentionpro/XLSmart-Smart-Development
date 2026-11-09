@@ -28,6 +28,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   - `APP_VERSION` bumped to 1.0.3
 
 ### Fixed
+- Released version 1.0.4 so Excel detects and installs the verified Power Dashboard update (2026-11-09)
+  - Restores browser dashboard controls by fixing the generated JavaScript parse error
+  - Uses a modeless, two-step range picker so Ctrl+Shift+Down/Right selects directly on the worksheet
+  - Refreshes the downloaded add-in SHA-256 in `installer/version.json`
 - Replaced truncated `modDashTemplate` with self-contained `BuildDashboardHTML` in `modPowerDashboardEngine` (2026-11-09)
   - Root cause: `modDashTemplate.bas` in the repository was incomplete/truncated at line 3209 inside `Sec08_HeaderLogo_14()`, causing compile error "Sub or Function not defined" on `Sec08_HeaderLogo_15()`
   - Restored full, self-contained HTML dashboard builder in `modPowerDashboardEngine.bas` (306 lines) with `gridlinesShow`, `smartLock`, multi-currency support, and UTF-8 encoding

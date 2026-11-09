@@ -7,7 +7,7 @@ Option Explicit
 
 Public Const APP_NAME As String = "XLSmart"
 
-Public Const APP_VERSION As String = "1.0.3"
+Public Const APP_VERSION As String = "1.0.4"
 Public Const APP_BUILD As String = "2026.11"
 
 Public Const APP_EDITION As String = "FREE"
