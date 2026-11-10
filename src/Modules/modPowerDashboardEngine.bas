@@ -8,6 +8,10 @@ Private Const TEMPLATE_START_RAW As String = "/*--RAWDATA_START--*/"
 Private Const TEMPLATE_END_RAW As String = "/*--RAWDATA_END--*/"
 Private Const TEMPLATE_START_CONFIG As String = "/*--AICONFIG_START--*/"
 Private Const TEMPLATE_END_CONFIG As String = "/*--AICONFIG_END--*/"
+Private Const DASHBOARD_SCHEMA_VERSION As Long = 2
+Private Const DASHBOARD_APPLICATION_NAME As String = "XLSmart"
+Private Const DASHBOARD_DEFAULT_THEME As String = "Animated"
+Private Const DASHBOARD_BOOTSTRAP_FILE_NAME As String = "XLSmart_PowerDashboard.html"
 
 Public Sub CreateDashboard(ByVal dashTitle As String, _
                            ByVal theme As String, _
@@ -65,7 +69,7 @@ Public Sub CreateDashboard(ByVal dashTitle As String, _
     htmlContent = ApplyDashboardSettings(htmlContent, dashTitle, theme, currencyCode, smartLock, gridlinesShow)
 
     Dim htmlPath As String
-    htmlPath = Environ$("TEMP") & "\XLSmart_PowerDashboard.html"
+    htmlPath = Environ$("TEMP") & "\" & DASHBOARD_BOOTSTRAP_FILE_NAME
     WriteUtf8 htmlPath, htmlContent
 
     If Dir$(htmlPath) = "" Then
@@ -175,21 +179,24 @@ Private Function BuildDashboardConfigJSON(ByVal dashTitle As String, _
 
     Dim config As String
     config = "{" & _
+             JsonPropertyName("schemaVersion") & CStr(DASHBOARD_SCHEMA_VERSION) & "," & _
+             JsonPropertyName("application") & JsonQuote(DASHBOARD_APPLICATION_NAME) & "," & _
              JsonPropertyName("title") & JsonQuote(dashTitle) & "," & _
-             JsonPropertyName("kpis") & "[" & _
-             KpiJSON("Total " & numericColumn, numericColumn, "sum", "fa-chart-line", 0, 0) & "," & _
-             KpiJSON("Average " & numericColumn, numericColumn, "avg", "fa-chart-bar", 3, 0) & "," & _
-             KpiJSON("Record Count", firstColumn, "count", "fa-table-list", 6, 0) & "]," & _
-             JsonPropertyName("charts") & "[" & _
-             ChartJSON("Analysis by " & dateColumn, "line", dateColumn, numericColumn, "sum", "Month", 0, 2, 6, 5) & "," & _
-             ChartJSON("Distribution by " & firstColumn, "bar", firstColumn, numericColumn, "sum", "None", 6, 2, 6, 5) & "]," & _
-             JsonPropertyName("slicers") & "[]," & _
-             JsonPropertyName("logoImage") & JsonQuote("") & "," & _
-             JsonPropertyName("logoIcon") & JsonQuote("") & "," & _
              JsonPropertyName("theme") & JsonQuote(TemplateThemeName(theme)) & "," & _
              JsonPropertyName("currency") & JsonQuote(currencyCode) & "," & _
              JsonPropertyName("showGrid") & JsonBoolean(gridlinesShow) & "," & _
-             JsonPropertyName("smartLock") & JsonBoolean(smartLock) & "}"
+             JsonPropertyName("smartLock") & JsonBoolean(smartLock) & "," & _
+             JsonPropertyName("visuals") & "[]," & _
+             JsonPropertyName("layout") & "{""columns"":12,""rowHeight"":80,""margin"":8}," & _
+             JsonPropertyName("data") & "{" & _
+             JsonPropertyName("sourceType") & JsonQuote("excel-range") & "," & _
+             JsonPropertyName("headers") & HeaderArrayJSON(headers) & "}," & _
+             JsonPropertyName("interactionState") & "{""filters"":{},""zoom"":{}}," & _
+             JsonPropertyName("kpis") & "[]," & _
+             JsonPropertyName("charts") & "[]," & _
+             JsonPropertyName("slicers") & "[]," & _
+             JsonPropertyName("logoImage") & JsonQuote("") & "," & _
+             JsonPropertyName("logoIcon") & JsonQuote("") & "}"
 
     BuildDashboardConfigJSON = config
 End Function
@@ -305,6 +312,23 @@ Private Function ReadJsonString(ByVal text As String, ByRef position As Long) As
     ReadJsonString = result
 End Function
 
+Private Function HeaderArrayJSON(ByRef headers() As String) As String
+    Dim i As Long
+    Dim result As String
+    On Error GoTo NoHeaders
+
+    result = "["
+    For i = LBound(headers) To UBound(headers)
+        If i > LBound(headers) Then result = result & ","
+        result = result & JsonQuote(headers(i))
+    Next i
+    HeaderArrayJSON = result & "]"
+    Exit Function
+
+NoHeaders:
+    HeaderArrayJSON = "[]"
+End Function
+
 Private Function FirstHeader(ByRef headers() As String) As String
     On Error GoTo NoHeader
     FirstHeader = headers(LBound(headers))
@@ -365,7 +389,7 @@ Private Function TemplateThemeName(ByVal theme As String) As String
     Select Case LCase$(Trim$(theme))
         Case "ocean", "forest", "rose": TemplateThemeName = "Ocean"
         Case "midnight", "navy", "slate": TemplateThemeName = "Midnight"
-        Case Else: TemplateThemeName = "Animated"
+        Case Else: TemplateThemeName = DASHBOARD_DEFAULT_THEME
     End Select
 End Function
 
@@ -445,7 +469,7 @@ Private Function ApplyDashboardSettings(ByVal html As String, ByVal dashTitle As
                   "window.XLSmartSmartLock = " & JsonBoolean(smartLock) & ";" & _
                   "window.XLSmartGridlinesShow = " & JsonBoolean(gridlinesShow) & ";"
 
-    html = Replace(html, "document.getElementById('mainTitle').innerText = 'XLBooster Dashboard';", titleScript)
+    html = Replace(html, "document.getElementById('mainTitle').innerText = 'XLSmart Dashboard';", titleScript)
     ApplyDashboardSettings = html
 End Function
 

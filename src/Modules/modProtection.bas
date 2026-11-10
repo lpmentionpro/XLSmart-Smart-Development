@@ -3,12 +3,12 @@ Option Explicit
 
 ' ============================================================
 ' MODULE: modProtection
-' XLBooster - Control Group - Protection
+' XLSmart - Control Group - Protection
 ' ============================================================
 
 Public Sub Protection_Main(control As IRibbonControl)
     MsgBox "Protection - Select a specific option from the dropdown menu.", _
-           vbInformation, "XLBooster - Protection"
+           vbInformation, "XLSmart - Protection"
 End Sub
 
 ' ----- Backup File -----
@@ -600,20 +600,20 @@ Public Sub Protection_LockFormulas(control As IRibbonControl)
     
     Set ws = ActiveSheet
     
-    pwd = InputBox("Enter password to lock all formula cells:", "XLBooster - Lock Formulas")
+    pwd = InputBox("Enter password to lock all formula cells:", "XLSmart - Lock Formulas")
     If pwd = "" Then
-        MsgBox "Lock cancelled. No password entered.", vbExclamation, "XLBooster"
+        MsgBox "Lock cancelled. No password entered.", vbExclamation, "XLSmart"
         Exit Sub
     End If
     
     If Len(pwd) < 4 Then
-        MsgBox "Password must be at least 4 characters!", vbExclamation, "XLBooster"
+        MsgBox "Password must be at least 4 characters!", vbExclamation, "XLSmart"
         Exit Sub
     End If
     
-    confirmPwd = InputBox("Re-enter password to confirm:", "XLBooster - Confirm Password")
+    confirmPwd = InputBox("Re-enter password to confirm:", "XLSmart - Confirm Password")
     If pwd <> confirmPwd Then
-        MsgBox "Passwords do not match! Lock cancelled.", vbExclamation, "XLBooster"
+        MsgBox "Passwords do not match! Lock cancelled.", vbExclamation, "XLSmart"
         Exit Sub
     End If
     
@@ -633,7 +633,7 @@ Public Sub Protection_LockFormulas(control As IRibbonControl)
     On Error GoTo ErrHandler
     
     If formulaRange Is Nothing Then
-        MsgBox "No formula cells found on this sheet!", vbExclamation, "XLBooster"
+        MsgBox "No formula cells found on this sheet!", vbExclamation, "XLSmart"
         Exit Sub
     End If
     
@@ -641,10 +641,10 @@ Public Sub Protection_LockFormulas(control As IRibbonControl)
     ws.Protect passWord:=pwd, DrawingObjects:=True, Contents:=True, Scenarios:=True
     
     MsgBox "All formula cells locked successfully!" & vbNewLine & _
-           "Data cells can still be edited.", vbInformation, "XLBooster"
+           "Data cells can still be edited.", vbInformation, "XLSmart"
     Exit Sub
 ErrHandler:
-    MsgBox "Error locking formulas: " & Err.Description, vbCritical, "XLBooster"
+    MsgBox "Error locking formulas: " & Err.Description, vbCritical, "XLSmart"
 End Sub
 
 ' ----- Unlock Formulas -----
@@ -654,19 +654,19 @@ Public Sub Protection_UnlockFormulas(control As IRibbonControl)
     
     Set ws = ActiveSheet
     
-    pwd = InputBox("Enter password to unlock formula cells:", "XLBooster - Unlock Formulas")
+    pwd = InputBox("Enter password to unlock formula cells:", "XLSmart - Unlock Formulas")
     If pwd = "" Then
-        MsgBox "Unlock cancelled.", vbExclamation, "XLBooster"
+        MsgBox "Unlock cancelled.", vbExclamation, "XLSmart"
         Exit Sub
     End If
     
     On Error GoTo ErrHandler
     ws.Unprotect passWord:=pwd
     ws.Cells.Locked = False
-    MsgBox "Formula cells unlocked successfully!", vbInformation, "XLBooster"
+    MsgBox "Formula cells unlocked successfully!", vbInformation, "XLSmart"
     Exit Sub
 ErrHandler:
-    MsgBox "Incorrect password or sheet is not protected!", vbExclamation, "XLBooster"
+    MsgBox "Incorrect password or sheet is not protected!", vbExclamation, "XLSmart"
 End Sub
 
 ' ----- Lock Selection -----

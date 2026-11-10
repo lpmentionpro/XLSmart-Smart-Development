@@ -604,7 +604,7 @@ Sub ShowSmartHighlighter(control As IRibbonControl)
         "• Click [YES] to automatically create it on a New Sheet." & vbCrLf & _
         "• Click [NO] to manually select a specific cell on an existing sheet.", _
         vbYesNoCancel + vbQuestion, _
-        "Choose Destination - XLBooster")
+        "Choose Destination - XLSmart")
 
     If ans = vbCancel Then Exit Sub
 
