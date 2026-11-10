@@ -175,21 +175,21 @@ Private Function BuildDashboardConfigJSON(ByVal dashTitle As String, _
 
     Dim config As String
     config = "{" & _
-             """title"":" & JsonQuote(dashTitle) & "," & _
-             """kpis"": [" & _
+             JsonPropertyName("title") & JsonQuote(dashTitle) & "," & _
+             JsonPropertyName("kpis") & "[" & _
              KpiJSON("Total " & numericColumn, numericColumn, "sum", "fa-chart-line", 0, 0) & "," & _
              KpiJSON("Average " & numericColumn, numericColumn, "avg", "fa-chart-bar", 3, 0) & "," & _
              KpiJSON("Record Count", firstColumn, "count", "fa-table-list", 6, 0) & "]," & _
-             """charts"": [" & _
+             JsonPropertyName("charts") & "[" & _
              ChartJSON("Analysis by " & dateColumn, "line", dateColumn, numericColumn, "sum", "Month", 0, 2, 6, 5) & "," & _
              ChartJSON("Distribution by " & firstColumn, "bar", firstColumn, numericColumn, "sum", "None", 6, 2, 6, 5) & "]," & _
-             """slicers"": []," & _
-             """logoImage"":"""," & _
-             """logoIcon"":"""," & _
-             """theme"":" & JsonQuote(TemplateThemeName(theme)) & "," & _
-             """currency"":" & JsonQuote(currencyCode) & "," & _
-             """showGrid"":" & JsonBoolean(gridlinesShow) & "," & _
-             """smartLock"":" & JsonBoolean(smartLock) & "}"
+             JsonPropertyName("slicers") & "[]," & _
+             JsonPropertyName("logoImage") & JsonQuote("") & "," & _
+             JsonPropertyName("logoIcon") & JsonQuote("") & "," & _
+             JsonPropertyName("theme") & JsonQuote(TemplateThemeName(theme)) & "," & _
+             JsonPropertyName("currency") & JsonQuote(currencyCode) & "," & _
+             JsonPropertyName("showGrid") & JsonBoolean(gridlinesShow) & "," & _
+             JsonPropertyName("smartLock") & JsonBoolean(smartLock) & "}"
 
     BuildDashboardConfigJSON = config
 End Function
@@ -197,25 +197,42 @@ End Function
 Private Function KpiJSON(ByVal title As String, ByVal columnName As String, _
                          ByVal aggregation As String, ByVal iconName As String, _
                          ByVal x As Long, ByVal y As Long) As String
-    KpiJSON = "{""title"":" & JsonQuote(title) & _
-              ",""col"":" & JsonQuote(columnName) & _
-              ",""agg"":" & JsonQuote(aggregation) & _
-              ",""icon"":" & JsonQuote(iconName) & _
-              ",""image"":""",""x"":" & CStr(x) & ",""y"":" & CStr(y) & ",""w"":3,""h"":2}"
+    KpiJSON = "{" & _
+              JsonPropertyName("title") & JsonQuote(title) & _
+              "," & JsonPropertyName("col") & JsonQuote(columnName) & _
+              "," & JsonPropertyName("agg") & JsonQuote(aggregation) & _
+              "," & JsonPropertyName("icon") & JsonQuote(iconName) & _
+              "," & JsonPropertyName("image") & JsonQuote("") & _
+              "," & JsonPropertyName("x") & CStr(x) & _
+              "," & JsonPropertyName("y") & CStr(y) & _
+              "," & JsonPropertyName("w") & "3," & _
+              JsonPropertyName("h") & "2}"
 End Function
 
 Private Function ChartJSON(ByVal title As String, ByVal chartType As String, _
                            ByVal xColumn As String, ByVal yColumn As String, _
                            ByVal aggregation As String, ByVal hierarchy As String, _
                            ByVal x As Long, ByVal y As Long, ByVal width As Long, ByVal height As Long) As String
-    ChartJSON = "{""title"":" & JsonQuote(title) & _
-                ",""type"":" & JsonQuote(chartType) & _
-                ",""top"":0,""xCol"":" & JsonQuote(xColumn) & _
-                ",""yCol"":" & JsonQuote(yColumn) & _
-                ",""agg"":" & JsonQuote(aggregation) & _
-                ",""xLabel"":""",""yLabel"":""",""hierarchy"":" & JsonQuote(hierarchy) & _
-                ",""labelMode"":""auto"",""labelsVisible"":true,""x"":" & CStr(x) & _
-                ",""y"":" & CStr(y) & ",""w"":" & CStr(width) & ",""h"":" & CStr(height) & "}"
+    ChartJSON = "{" & _
+                JsonPropertyName("title") & JsonQuote(title) & _
+                "," & JsonPropertyName("type") & JsonQuote(chartType) & _
+                "," & JsonPropertyName("top") & "0," & _
+                JsonPropertyName("xCol") & JsonQuote(xColumn) & _
+                "," & JsonPropertyName("yCol") & JsonQuote(yColumn) & _
+                "," & JsonPropertyName("agg") & JsonQuote(aggregation) & _
+                "," & JsonPropertyName("xLabel") & JsonQuote("") & _
+                "," & JsonPropertyName("yLabel") & JsonQuote("") & _
+                "," & JsonPropertyName("hierarchy") & JsonQuote(hierarchy) & _
+                "," & JsonPropertyName("labelMode") & JsonQuote("auto") & _
+                "," & JsonPropertyName("labelsVisible") & "true," & _
+                JsonPropertyName("x") & CStr(x) & _
+                "," & JsonPropertyName("y") & CStr(y) & _
+                "," & JsonPropertyName("w") & CStr(width) & _
+                "," & JsonPropertyName("h") & CStr(height) & "}"
+End Function
+
+Private Function JsonPropertyName(ByVal name As String) As String
+    JsonPropertyName = JsonQuote(name) & ":"
 End Function
 
 Private Function HeadersFromRawData(ByVal rawDataJson As String) As String()
