@@ -185,8 +185,16 @@ try {
                 $InCode = $false
 
                 foreach ($Line in $Lines) {
-                    if ($Line -match '^Attribute\s+VB_') { continue }
-                    if ($Line -match '^VERSION\s+') { continue }
+                    # Exported document modules begin with a class-file header:
+                    # VERSION ... / BEGIN ... / END / Attribute declarations.
+                    # Those lines are metadata, not VBA statements, and inserting
+                    # them into the document code pane causes "Invalid outside procedure".
+                    if (-not $InCode -and (
+                        $Line -match '^\s*VERSION\s+' -or
+                        $Line -match '^\s*BEGIN\s*$' -or
+                        $Line -match '^\s*END\s*$' -or
+                        $Line -match '^\s*MultiUse\s*=' -or
+                        $Line -match '^\s*Attribute\s+VB_')) { continue }
                     if ($Line -match '^\s*$' -and -not $InCode) { continue }
                     $InCode = $true
                     $CodeLines += $Line
