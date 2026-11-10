@@ -1,6 +1,15 @@
 Attribute VB_Name = "modHelpMenu"
 Option Explicit
 
+Private Const TRUSTED_ADDIN_DOWNLOAD_URL As String = _
+    "https://raw.githubusercontent.com/lpmentionpro/xlsmart-smart-development/main/workbook/xlsmart_user.xlam"
+
+#If VBA7 Then
+    Private Declare PtrSafe Function GetCurrentProcessId Lib "kernel32" () As Long
+#Else
+    Private Declare Function GetCurrentProcessId Lib "kernel32" () As Long
+#End If
+
 '=================================
 ' HOW TO USE XLSMART
 '=================================
@@ -48,10 +57,29 @@ Public Sub Help_CheckUpdates(control As IRibbonControl)
     downloadUrl = GetJsonValue(responseText, "download_url")
     sha256Expected = GetJsonValue(responseText, "sha256")
 
+    If Not IsValidVersion(latestVersion) Or _
+       Not IsTrustedDownloadUrl(downloadUrl) Or _
+       Not IsSha256(sha256Expected) Then
+
+        MsgBox "The update information could not be verified." & vbCrLf & vbCrLf & _
+               "Your installed XLSmart add-in was not changed.", _
+               vbExclamation, _
+               "XLSmart Update"
+        Exit Sub
+
+    End If
+
     If latestVersion = APP_VERSION Then
 
         MsgBox "You are already using the latest version of XLSmart (" & _
                APP_VERSION & ").", _
+               vbInformation, _
+               "XLSmart Update"
+
+    ElseIf Not IsVersionNewer(latestVersion, APP_VERSION) Then
+
+        MsgBox "The update server did not provide a newer XLSmart version." & vbCrLf & vbCrLf & _
+               "Your installed add-in was not changed.", _
                vbInformation, _
                "XLSmart Update"
 
@@ -61,8 +89,8 @@ Public Sub Help_CheckUpdates(control As IRibbonControl)
             "New XLSmart update available!" & vbCrLf & vbCrLf & _
             "Current Version: " & APP_VERSION & vbCrLf & _
             "Latest Version: " & latestVersion & vbCrLf & vbCrLf & _
-            "Do you want to update now?" & vbCrLf & vbCrLf & _
-            "(Excel will restart after update)", _
+            "Do you want to download and install it now?" & vbCrLf & vbCrLf & _
+            "Excel will close. Reopen Excel normally after the update finishes.", _
             vbYesNo + vbQuestion, _
             "XLSmart Update") = vbYes Then
 
@@ -90,16 +118,38 @@ Private Sub PerformUpdate(ByVal downloadUrl As String, ByVal expectedSha256 As S
 
     Dim http As Object
     Dim stream As Object
+    Dim shell As Object
     Dim dst As String
-    Dim ai As AddIn
+    Dim stage As String
+    Dim statusPath As String
+    Dim helperPath As String
     Dim downloadedHash As String
+    Dim responseBody As Variant
+    Dim command As String
+    Dim excelPid As Long
 
     On Error GoTo ErrHandler
 
-    Application.DisplayAlerts = False
+    If HasUnsavedUserWorkbooks() Then
+        MsgBox "Please save or close your unsaved workbooks before updating XLSmart." & _
+               vbCrLf & vbCrLf & "No update files were installed.", _
+               vbExclamation, "XLSmart Update"
+        Exit Sub
+    End If
+
     Application.StatusBar = "XLSmart: Downloading update..."
 
-    ' Download URL
+    dst = Environ$("APPDATA") & "\Microsoft\AddIns\XLSmart_User.xlam"
+    excelPid = GetCurrentProcessId
+    stage = dst & ".staged." & Format(Now, "yyyymmdd_hhnnss") & "_" & _
+            CStr(excelPid) & "_" & Format$(CLng(Timer * 1000), "00000000") & ".xlam"
+    statusPath = stage & ".log"
+    helperPath = Environ$("APPDATA") & "\Microsoft\AddIns\Install-AddinUpdate.ps1"
+
+    If Dir(helperPath) = "" Then
+        Err.Raise vbObjectError + 503, , "The update helper is missing from the XLSmart installation."
+    End If
+
     Set http = CreateObject("MSXML2.XMLHTTP")
     http.Open "GET", downloadUrl, False
     http.Send
@@ -107,75 +157,53 @@ Private Sub PerformUpdate(ByVal downloadUrl As String, ByVal expectedSha256 As S
     If http.Status <> 200 Then
         Err.Raise vbObjectError + 500, , "Download failed. HTTP Status: " & http.Status
     End If
-
-    Application.StatusBar = "XLSmart: Installing update..."
-
-    ' Destination path
-    dst = Environ$("APPDATA") & "\Microsoft\AddIns\XLSmart_User.xlam"
-
-    ' Backup existing version
-    If Dir(dst) <> "" Then
-        On Error Resume Next
-        SetAttr dst, vbNormal
-        Dim backupPath As String
-        backupPath = dst & ".backup"
-        Kill backupPath
-        Name dst As backupPath
-        On Error GoTo ErrHandler
+    responseBody = http.responseBody
+    If IsEmpty(responseBody) Then
+        Err.Raise vbObjectError + 504, , "The update server returned an empty file."
     End If
 
-    ' Save downloaded file
     Set stream = CreateObject("ADODB.Stream")
     stream.Type = 1
     stream.Open
-    stream.Write http.responseBody
-    stream.SaveToFile dst, 2
+    stream.Write responseBody
+    stream.SaveToFile stage, 2
     stream.Close
+    Set stream = Nothing
 
-    ' Verify SHA256 if provided
-    If Len(expectedSha256) > 0 Then
-        downloadedHash = GetFileSha256(dst)
-        If LCase(downloadedHash) <> LCase(expectedSha256) Then
-            Err.Raise vbObjectError + 501, , "File integrity check failed."
-        End If
+    downloadedHash = GetFileSha256(stage)
+    If LCase$(downloadedHash) <> LCase$(expectedSha256) Then
+        Kill stage
+        Err.Raise vbObjectError + 501, , "File integrity check failed."
     End If
 
-    ' Unload old add-in
-    On Error Resume Next
-    For Each ai In AddIns
-        If LCase(ai.Name) = "xlsmart_user.xlam" Then
-            ai.Installed = False
-            AddIns.Remove ai
-            Exit For
-        End If
-    Next ai
-    On Error GoTo ErrHandler
+    Application.StatusBar = "XLSmart: Update staged; Excel will close..."
+    Set shell = CreateObject("WScript.Shell")
+    command = "powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File " & _
+              QuoteShellArgument(helperPath) & _
+              " -StagedPath " & QuoteShellArgument(stage) & _
+              " -DestinationPath " & QuoteShellArgument(dst) & _
+              " -ExpectedSha256 " & QuoteShellArgument(expectedSha256) & _
+              " -ExcelPid " & CStr(excelPid) & _
+              " -StatusPath " & QuoteShellArgument(statusPath)
 
-    ' Install new add-in
-    Set ai = AddIns.Add(dst)
-    ai.Installed = True
+    If shell.Run(command, 0, False) <> 0 Then
+        Err.Raise vbObjectError + 505, , "The external update helper could not be started."
+    End If
 
-    Application.StatusBar = False
-    Application.DisplayAlerts = True
-
-    MsgBox "XLSmart updated successfully!" & vbCrLf & vbCrLf & _
-           "Excel will now restart.", _
-           vbInformation, _
-           "Update Complete"
+    MsgBox "Update file downloaded and verified." & vbCrLf & vbCrLf & _
+           "Excel will now close. Reopen Excel normally after a few seconds to use the new version.", _
+           vbInformation, "XLSmart Update"
 
     Application.Quit
-
     Exit Sub
 
 ErrHandler:
 
+    On Error Resume Next
+    If Not stream Is Nothing Then stream.Close
     Application.StatusBar = False
-    Application.DisplayAlerts = True
-
     MsgBox "Update failed:" & vbCrLf & vbCrLf & _
-           Err.Description, _
-           vbCritical, _
-           "Update Error"
+           Err.Description, vbCritical, "Update Error"
 
 End Sub
 
@@ -183,22 +211,98 @@ End Sub
 '=================================
 ' CALCULATE FILE SHA256
 '=================================
+Private Function HasUnsavedUserWorkbooks() As Boolean
+    Dim wb As Workbook
+
+    For Each wb In Application.Workbooks
+        If Not wb.IsAddin Then
+            If wb.Saved = False Then
+                HasUnsavedUserWorkbooks = True
+                Exit Function
+            End If
+        End If
+    Next wb
+End Function
+
 Private Function GetFileSha256(ByVal filePath As String) As String
 
     Dim shell As Object
     Dim exec As Object
     Dim output As String
+    Dim command As String
+    Dim line As Variant
 
-    On Error Resume Next
+    On Error GoTo HashError
 
     Set shell = CreateObject("WScript.Shell")
-    Set exec = shell.Exec("powershell -NoProfile -Command ""(Get-FileHash -Path '" & filePath & "' -Algorithm SHA256).Hash""")
+    command = "cmd.exe /d /c certutil -hashfile " & QuoteShellArgument(filePath) & " SHA256"
+    Set exec = shell.Exec(command)
     output = exec.StdOut.ReadAll()
 
-    GetFileSha256 = Trim(output)
+    For Each line In Split(Replace$(output, vbCr, ""), vbLf)
+        line = Replace$(Trim$(CStr(line)), " ", "")
+        If Len(line) = 64 And IsSha256(CStr(line)) Then
+            GetFileSha256 = UCase$(CStr(line))
+            Exit Function
+        End If
+    Next line
+    Err.Raise vbObjectError + 506, , "Unable to calculate the update file SHA-256."
 
-    On Error GoTo 0
+HashError:
+    GetFileSha256 = vbNullString
 
+End Function
+
+Private Function QuoteShellArgument(ByVal value As String) As String
+    ' Windows file names cannot contain quotation marks. Quoting makes spaces safe.
+    QuoteShellArgument = """" & value & """"
+End Function
+
+Private Function IsSha256(ByVal value As String) As Boolean
+    Dim i As Long
+    Dim ch As String
+
+    If Len(value) <> 64 Then Exit Function
+    For i = 1 To 64
+        ch = Mid$(value, i, 1)
+        If InStr(1, "0123456789abcdefABCDEF", ch, vbBinaryCompare) = 0 Then Exit Function
+    Next i
+    IsSha256 = True
+End Function
+
+Private Function IsValidVersion(ByVal value As String) As Boolean
+    Dim parts() As String
+    Dim i As Long
+
+    parts = Split(value, ".")
+    If UBound(parts) <> 2 Then Exit Function
+    For i = 0 To 2
+        If Len(parts(i)) = 0 Or Not IsNumeric(parts(i)) Then Exit Function
+        If CStr(CLng(parts(i))) <> parts(i) Then Exit Function
+    Next i
+    IsValidVersion = True
+End Function
+
+Private Function IsVersionNewer(ByVal candidate As String, ByVal current As String) As Boolean
+    Dim newParts() As String
+    Dim oldParts() As String
+    Dim i As Long
+
+    newParts = Split(candidate, ".")
+    oldParts = Split(current, ".")
+    For i = 0 To 2
+        If CLng(newParts(i)) > CLng(oldParts(i)) Then
+            IsVersionNewer = True
+            Exit Function
+        ElseIf CLng(newParts(i)) < CLng(oldParts(i)) Then
+            Exit Function
+        End If
+    Next i
+End Function
+
+Private Function IsTrustedDownloadUrl(ByVal value As String) As Boolean
+    IsTrustedDownloadUrl = _
+        (StrComp(value, TRUSTED_ADDIN_DOWNLOAD_URL, vbTextCompare) = 0)
 End Function
 
 

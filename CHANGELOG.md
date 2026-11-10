@@ -33,6 +33,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   - `APP_VERSION` bumped to 1.0.3
 
 ### Fixed
+- Made automatic XLSmart updates safe when the active add-in is locked by Excel (2026-11-10)
+  - Downloads and SHA-256 verifies the update in a staging file before Excel exits
+  - Uses the packaged external updater only after the calling Excel process releases the add-in
+  - Creates a unique timestamped backup, verifies the replacement, and rolls back on failure
+  - Refuses updates while a user workbook has unsaved changes and no longer reports success before installation completes
 - Released version 1.0.4 so Excel detects and installs the verified Power Dashboard update (2026-11-09)
   - Restores browser dashboard controls by fixing the generated JavaScript parse error
   - Uses a modeless, two-step range picker so Ctrl+Shift+Down/Right selects directly on the worksheet

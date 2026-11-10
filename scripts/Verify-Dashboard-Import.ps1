@@ -26,7 +26,7 @@ try {
         'VBA injects Excel data into template' = $engineText.Contains('ReplaceTemplateSection') -and $engineText.Contains('let rawData = ')
         'VBA can cache the template after update' = $engineText.Contains('DownloadDashboardTemplate') -and $engineText.Contains('assets/PowerDashboardTemplate.html')
         'Modeless dashboard form' = $ribbonText.Contains('frmDashboard.Show vbModeless')
-        'Manual worksheet picker mode' = $formText.Contains('mSelectingRange') -and $formText.Contains('Use Selected Range') -and -not $formText.Contains('Application.InputBox')
+        'Native range picker supports keyboard selection' = $formText.Contains('Application.InputBox') -and $formText.Contains('Type:=8') -and $formText.Contains('Ctrl+Shift+Arrow') -and -not $formText.Contains('mSelectingRange')
     }
 
     $checks.GetEnumerator() | ForEach-Object {

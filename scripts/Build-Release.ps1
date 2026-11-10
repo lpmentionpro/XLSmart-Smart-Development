@@ -210,6 +210,12 @@ if (-not (Test-Path $ReleasePath)) {
 }
 
 $ReleaseXlam = Join-Path $ReleasePath "XLSmart_User.xlam"
+$UpdaterSource = Join-Path $ScriptDir "Install-AddinUpdate.ps1"
+$UpdaterDestination = Join-Path $ReleasePath "Install-AddinUpdate.ps1"
+
+if (-not (Test-Path -LiteralPath $UpdaterSource -PathType Leaf)) {
+    Write-Fail "Updater helper not found: $UpdaterSource"
+}
 
 if ((Test-Path $ReleaseXlam) -and -not $Force) {
     Write-Host "`n  Existing release file: $ReleaseXlam" -ForegroundColor Yellow
@@ -220,10 +226,12 @@ if ((Test-Path $ReleaseXlam) -and -not $Force) {
     }
 }
 
-# Copy workbook to release
-Write-Info "Copying workbook to release\"
+# Copy workbook and trusted updater helper to release
+Write-Info "Copying workbook and updater helper to release\"
 Copy-Item $WorkbookPath $ReleaseXlam -Force
+Copy-Item -LiteralPath $UpdaterSource -Destination $UpdaterDestination -Force
 Write-Pass "Copied: $ReleaseXlam"
+Write-Pass "Copied updater helper: $UpdaterDestination"
 
 # Compute hash of release copy (authoritative)
 $ReleaseHash = Get-SHA256 $ReleaseXlam
@@ -274,16 +282,18 @@ if (Test-Path $ChangelogPath) {
         Write-Warn "Could not find [Unreleased] section in CHANGELOG.md — edit manually."
     }
 
-    # Append SHA-256 entry after the version header
-    $HashLine = "### Release Artifacts"
-    $HashEntry = "- XLSmart_User.xlam SHA-256: $($ReleaseHash.ToLower())"
-    $CLContent = Get-Content $ChangelogPath -Raw
+    # Append the release hash only once beneath the version header.
+    $HashLine = '### Release Artifacts'
+    $HashEntry = '- XLSmart_User.xlam SHA-256: ' + $ReleaseHash.ToLower()
+    $CLContent = Get-Content -LiteralPath $ChangelogPath -Raw
     $EscapedVersion = [regex]::Escape($Version)
-    $Pattern = "(## \[$EscapedVersion\] - $Today)"
-    $Replacement = '$1' + [Environment]::NewLine + [Environment]::NewLine + $HashLine + [Environment]::NewLine + $HashEntry
-    $CLContent = $CLContent -replace $Pattern, $Replacement
-    $CLContent | Set-Content $ChangelogPath -Encoding UTF8
-    Write-Pass "CHANGELOG.md: Appended SHA-256 entry for v$Version"
+    $HeaderPattern = '## \[' + $EscapedVersion + '\] - ' + $Today
+    if ($CLContent -notmatch [regex]::Escape($HashEntry)) {
+        $HashBlock = $HashLine + [Environment]::NewLine + $HashEntry
+        $CLContent = $CLContent -replace $HeaderPattern, ('$0' + [Environment]::NewLine + [Environment]::NewLine + $HashBlock)
+        $CLContent | Set-Content -LiteralPath $ChangelogPath -Encoding UTF8
+    }
+    Write-Pass "CHANGELOG.md: Ensured SHA-256 entry for v$Version"
 }
 else {
     Write-Warn "CHANGELOG.md not found — skipping."

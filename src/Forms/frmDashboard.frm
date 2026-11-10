@@ -16,7 +16,6 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private mHeaderRow As Long
-Private mSelectingRange As Boolean
 
 Private Sub UserForm_Initialize()
 
@@ -90,7 +89,6 @@ Private Sub UpdateDataSourceUI()
     txtRangeTextBox.text = ""
     txtRangeTextBox.Tag = ""
 
-    mSelectingRange = False
     btnPickRangeCommandButton.Caption = "Pick Range"
 
     txtSheets.text = ""
@@ -98,7 +96,7 @@ Private Sub UpdateDataSourceUI()
 
     If radiooptSingleOptionButton.Value = True Then
         lblStatusLabel.Caption = _
-            "Click Pick and select range with mouse or Ctrl+Shift+Down+Right."
+            "Click Pick Range, then use mouse or Ctrl+Shift+Arrow in the Excel range box."
     Else
         lblStatusLabel.Caption = _
             "Click Pick and select sheets."
@@ -120,24 +118,21 @@ Private Sub PickSingleTableRange()
 
     Dim selected_rng As Range
 
-    ' Two-step modeless selection avoids the InputBox reference-field focus trap.
-    ' The user selects directly on the worksheet, then clicks this button again.
-    If Not mSelectingRange Then
-        mSelectingRange = True
-        btnPickRangeCommandButton.Caption = "Use Selected Range"
-        lblStatusLabel.Caption = _
-            "Select the full range on the sheet: click the first header, press Ctrl+Shift+Down, then Ctrl+Shift+Right. Click Use Selected Range when done."
-        Exit Sub
-    End If
-
+    ' Type 8 opens Excel's native reference picker. It keeps the worksheet active,
+    ' so mouse selection and Ctrl+Shift+Arrow work before the user confirms with Enter.
+    Me.Hide
     On Error Resume Next
-    If TypeName(Application.Selection) = "Range" Then
-        Set selected_rng = Application.Selection
-    End If
+    Set selected_rng = Application.InputBox( _
+        Prompt:="Select the full dashboard table, including the header row. " & _
+                "Use mouse or Ctrl+Shift+Arrow, then press Enter.", _
+        Title:="Pick Dashboard Data Range", _
+        Type:=8)
+    Err.Clear
     On Error GoTo 0
+    Me.Show vbModeless
 
     If selected_rng Is Nothing Then
-        lblStatusLabel.Caption = "Select a cell range on the worksheet first."
+        lblStatusLabel.Caption = "Range selection cancelled."
         Exit Sub
     End If
 
@@ -147,7 +142,7 @@ Private Sub PickSingleTableRange()
     End If
 
     If selected_rng.Rows.Count < 2 Or selected_rng.Columns.Count < 1 Then
-        MsgBox "Select the header row and at least one data row. Start at the first header, then use Ctrl+Shift+Down and Ctrl+Shift+Right.", vbExclamation
+        MsgBox "Select the header row and at least one data row.", vbExclamation
         Exit Sub
     End If
 
@@ -157,8 +152,6 @@ Private Sub PickSingleTableRange()
                           selected_rng.Worksheet.Name & "|" & _
                           selected_rng.Address(False, False)
 
-    mSelectingRange = False
-    btnPickRangeCommandButton.Caption = "Pick Range"
     lblStatusLabel.Caption = "Range Selected: " & _
                              (selected_rng.Rows.Count - 1) & _
                              " data rows (" & selected_rng.Address(False, False) & ")"
