@@ -23,13 +23,14 @@ Private Sub UserForm_Initialize()
 
     With cmbThemeComboBox
         .Clear
+        .AddItem "Animated (Live Portfolio)"
         .AddItem "Ocean (Blue Light)"
         .AddItem "Midnight (Dark)"
         .AddItem "Slate (Dark Blue)"
         .AddItem "Forest (Green)"
         .AddItem "Rose (Pink)"
         .AddItem "Navy (Deep Blue)"
-        .ListIndex = 1
+        .ListIndex = 0
     End With
 
     With cmbCurrencyComboBox
@@ -250,13 +251,14 @@ Private Sub btnCreateCommandButton_Click()
     End If
 
     Select Case cmbThemeComboBox.ListIndex
-        Case 0: themeName = "ocean"
-        Case 1: themeName = "midnight"
-        Case 2: themeName = "slate"
-        Case 3: themeName = "forest"
-        Case 4: themeName = "rose"
-        Case 5: themeName = "navy"
-        Case Else: themeName = "midnight"
+        Case 0: themeName = "animated"
+        Case 1: themeName = "ocean"
+        Case 2: themeName = "midnight"
+        Case 3: themeName = "slate"
+        Case 4: themeName = "forest"
+        Case 5: themeName = "rose"
+        Case 6: themeName = "navy"
+        Case Else: themeName = "animated"
     End Select
 
     Select Case cmbCurrencyComboBox.ListIndex

@@ -576,7 +576,7 @@ Public Sub DataUtilities_InsertCheckBoxes(control As IRibbonControl)
 
     Set rng = Application.InputBox( _
         "Select a cell range to insert check boxes", _
-        "XLBooster", Type:=8)
+        "XLSmart", Type:=8)
 
     On Error GoTo 0
 

@@ -1,6 +1,6 @@
 Attribute VB_Name = "modStandardFormulas"
 '==============================================================================
-' XLBooster - Standard Formulas Module
+' XLSmart - Standard Formulas Module
 ' 11 Custom Worksheet Functions (UDFs)
 ' Compatible with: Excel 2016+
 '==============================================================================
